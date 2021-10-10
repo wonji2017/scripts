@@ -1,0 +1,31 @@
+name: Build linux
+
+on:
+  push:
+    paths:
+      - 'linux'
+      
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Install dependencies
+      run: ./install-deps.sh
+      
+    - name: Get current commit of the linux submoudle
+      run: echo "CUR_COMMIT=$(git rev-parse HEAD:linux)" >> $GITHUB_ENV
+      
+    - name: Download the submodule
+      run: wget https://github.com/wonji2017/linux/archive/${{ env.CUR_COMMIT }}.zip
+      
+    - name: Unzip the downloaded submodule
+      run: unzip ${{ env.CUR_COMMIT }}.zip
+      
+    - name: Build linux
+      run: ./build-linux.sh linux-${{ env.CUR_COMMIT }} tinyconfig
